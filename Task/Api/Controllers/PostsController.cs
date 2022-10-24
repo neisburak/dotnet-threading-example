@@ -1,6 +1,5 @@
-using System.Net;
-using System.Text.Json;
 using Api.Models;
+using Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -9,27 +8,24 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class PostsController : ControllerBase
 {
+    private readonly ILogger<PostsController> _logger;
+    private readonly string _postsUrl = "https://jsonplaceholder.typicode.com/posts";
+
+    public PostsController(ILogger<PostsController> logger)
+    {
+        _logger = logger;
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAsync()
     {
-        var result = await GetAsync<IEnumerable<Post>>("https://jsonplaceholder.typicode.com/posts");
+        var task = _postsUrl.GetAsync<IEnumerable<Post>>(_logger); // Invoked without waiting.
+
+        var postResult = await $"{_postsUrl}/1".GetAsync<Post>(_logger); // Waiting for response here.
+
+        var result = await task; // Waiting for response too.
+
         if (result is not null) return Ok(result);
         return BadRequest();
-    }
-
-    private async Task<T?> GetAsync<T>(string url)
-    {
-        var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync(url);
-        if (response.StatusCode is HttpStatusCode.OK)
-        {
-            var stream = await response.Content.ReadAsStreamAsync();
-            var result = await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            return result;
-        }
-        return default;
     }
 }
