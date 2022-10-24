@@ -20,15 +20,15 @@ public class PostsController : ControllerBase
     private async Task<T?> GetAsync<T>(string url)
     {
         var httpClient = new HttpClient();
-        var result = await httpClient.GetAsync(url);
-        if (result.StatusCode == HttpStatusCode.OK)
+        var response = await httpClient.GetAsync(url);
+        if (response.StatusCode is HttpStatusCode.OK)
         {
-            var stream = await result.Content.ReadAsStreamAsync();
-            var data = await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions
+            var stream = await response.Content.ReadAsStreamAsync();
+            var result = await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
-            return data;
+            return result;
         }
         return default;
     }
