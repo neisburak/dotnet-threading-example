@@ -18,14 +18,14 @@ public class PostManager : IPostService
 
     public async Task<Post?> GetAsync(int id)
     {
-        _logger.LogInformation($"{nameof(GetAsync)}(id) triggered.");
+        _logger.LogInformation($"{nameof(GetAsync)}(id) triggered at {DateTime.Now.GetTime()}.");
 
         return await $"{POSTS_URL}/{id}".GetAsync<Post>();
     }
 
     public async Task<IEnumerable<Post>?> GetAsync()
     {
-        _logger.LogInformation($"{nameof(GetAsync)}() triggered.");
+        _logger.LogInformation($"{nameof(GetAsync)}() triggered at {DateTime.Now.GetTime()}.");
 
         return await POSTS_URL.GetAsync<IEnumerable<Post>>();
     }
