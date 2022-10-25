@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Common.Services.Abstract;
+using Common.Entities;
 
 namespace Api.Controllers;
 
@@ -13,6 +14,9 @@ public class PostsController : ControllerBase
     {
         _postService = postService;
     }
+
+    [HttpGet("{id}")]
+    public Task<Post?> GetAsync(int id) => _postService.GetAsync(id);
 
     [HttpGet]
     public async Task<IActionResult> GetAsync()
