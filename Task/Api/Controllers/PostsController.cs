@@ -17,7 +17,7 @@ public class PostsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAsync()
     {
-        var task = _postService.GetAsync(); // Invoked without waiting.
+        var task = _postService.GetAsync(); // Invoked immediately without waiting.
 
         var postResult = await _postService.GetAsync(1); // Waiting for response here.
 
