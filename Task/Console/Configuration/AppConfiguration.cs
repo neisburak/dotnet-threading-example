@@ -1,4 +1,5 @@
 using Common.Extensions;
+using Common.Services.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -6,6 +7,7 @@ namespace Console.Configuration;
 
 public interface IAppConfiguration
 {
+    IPostService PostService { get; }
     T GetService<T>() where T : class;
 }
 
@@ -20,6 +22,8 @@ public class AppConfiguration : IAppConfiguration
         builder.AddCommonServices();
         _provider = builder.BuildServiceProvider();
     }
+
+    public IPostService PostService => _provider.GetRequiredService<IPostService>();
 
     public T GetService<T>() where T : class => _provider.GetRequiredService<T>();
 }
