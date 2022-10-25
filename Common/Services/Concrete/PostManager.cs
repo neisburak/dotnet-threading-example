@@ -7,7 +7,7 @@ namespace Common.Services.Concrete;
 
 public class PostManager : IPostService
 {
-    private const string POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
+    private const string POSTS_URL = $"{Constants.BASE_URL}/posts";
 
     private readonly ILogger<PostManager> _logger;
 
