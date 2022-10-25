@@ -1,6 +1,5 @@
-using Api.Models;
-using Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Common.Services.Abstract;
 
 namespace Api.Controllers;
 
@@ -8,24 +7,22 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class PostsController : ControllerBase
 {
-    private readonly ILogger<PostsController> _logger;
-    private readonly string _postsUrl = "https://jsonplaceholder.typicode.com/posts";
+    private readonly IPostService _postService;
 
-    public PostsController(ILogger<PostsController> logger)
+    public PostsController(IPostService postService)
     {
-        _logger = logger;
+        _postService = postService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAsync()
     {
-        var task = _postsUrl.GetAsync<IEnumerable<Post>>(_logger); // Invoked without waiting.
+        var task = _postService.GetAsync(); // Invoked without waiting.
 
-        var postResult = await $"{_postsUrl}/1".GetAsync<Post>(_logger); // Waiting for response here.
+        var postResult = await _postService.GetAsync(1); // Waiting for response here.
 
         var result = await task; // Waiting for response too.
 
-        if (result is not null) return Ok(result);
-        return BadRequest();
+        return result is not null ? Ok(result) : BadRequest();
     }
 }
