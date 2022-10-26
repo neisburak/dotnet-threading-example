@@ -3,4 +3,12 @@ using Console.Configuration;
 
 var app = AppBuilder.Build();
 
-app.ForEach(perform: true);
+app.ResizeForEach(perform: false);
+
+app.TotalSizeForEach(perform: false, raceCondition: true);
+
+app.TotalSizeFor(perform: true);
+
+
+
+
