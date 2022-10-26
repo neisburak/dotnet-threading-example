@@ -24,7 +24,7 @@ await app.FromResult(perform: false);
 try
 {
     var tokenSource = new CancellationTokenSource();
-    var task = app.CancelationToken(tokenSource.Token, perform: true);
+    var task = app.CancelationToken(tokenSource.Token, perform: false);
     tokenSource.Cancel();
     await task;
 }
@@ -35,5 +35,11 @@ catch (TaskCanceledException ex)
 
 app.Result(perform: false);
 
-var post = await app.ValueTask(perform: true);
-app.WriteLine(post);
+app.WriteLine(await app.ValueTask(perform: false));
+
+
+app.WriteLine("App running.");
+var work = app.Work(perform: true);
+app.WriteLine("Doing other stuff.");
+await work;
+app.WriteLine("App completed.");

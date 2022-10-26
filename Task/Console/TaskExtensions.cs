@@ -158,4 +158,12 @@ public static class TaskExtensions
 
         return new ValueTask<Post?>(cachedData);
     }
+
+    public static async Task Work(this IAppConfiguration configuration, bool perform = true)
+    {
+        if (!perform) return;
+        configuration.WriteLine("Before Work()");
+        await Task.Run(() => configuration.WriteLine("Work() completed."));
+        configuration.WriteLine("After Work()");
+    }
 }
