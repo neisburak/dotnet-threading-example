@@ -8,7 +8,19 @@ app.AsParallel(perform: false);
 
 app.ForAll(perform: false);
 
+
 var context = app.GetService<NorthwindContext>();
 
-var list = context.Products.ToList();
-list.ForEach(f => app.WriteLine(f.ProductName));
+app.ForAll(context, perform: false);
+
+app.WithDegreeOfParallelism(context, perform: false);
+
+app.WithExecuteMode(context, perform: false);
+
+app.AsOrdered(context, perform: false);
+
+app.ExceptionHandling(context, perform: true);
+
+var tokenSource = new CancellationTokenSource();
+tokenSource.Cancel();
+app.CanellationToken(context, tokenSource.Token, perform: true);
