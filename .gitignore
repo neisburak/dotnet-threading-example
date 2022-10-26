@@ -456,4 +456,4 @@ $RECYCLE.BIN/
 ## appsettings.json
 appsettings.*.json
 
-Thumbnails/**.*
+Thumbnails/
