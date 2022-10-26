@@ -101,9 +101,9 @@ public static class PLINQExtensions
 
             list.AsParallel().WithCancellation(cancellationToken).Where(w => w.UnitPrice > 10).ForAll(f => configuration.WriteLine(f.ProductName));
         }
-        catch (AggregateException ex)
+        catch (OperationCanceledException ex)
         {
-            ex.InnerExceptions.ToList().ForEach(f => configuration.WriteLine(f.Message));
+            configuration.WriteLine(ex.Message);
         }
     }
 }

@@ -19,7 +19,7 @@ app.WithExecuteMode(context, perform: false);
 
 app.AsOrdered(context, perform: false);
 
-app.ExceptionHandling(context, perform: true);
+app.ExceptionHandling(context, perform: false);
 
 var tokenSource = new CancellationTokenSource();
 tokenSource.Cancel();
