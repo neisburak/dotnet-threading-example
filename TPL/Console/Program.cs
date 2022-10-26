@@ -9,6 +9,8 @@ app.TotalSizeForEach(perform: false, raceCondition: true);
 
 app.TotalSizeFor(perform: false);
 
-app.TotalSizeForEachWithSharedData(perform: true);
+app.TotalSizeForEachWithSharedData(perform: false);
 
-
+var tokenSource = new CancellationTokenSource();
+tokenSource.Cancel();
+app.WithCancellationToken(tokenSource.Token, perform: true);

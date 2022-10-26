@@ -127,4 +127,39 @@ public static class TPLExtensions
 
         configuration.WriteLine($"File sizes received. {totalSize / 1024 / 1024} mb");
     }
+
+    public static void WithCancellationToken(this IAppConfiguration configuration, CancellationToken cancellationToken, bool perform = true)
+    {
+        if (!perform) return;
+
+        var totalSize = 0L;
+
+        var items = Directory.GetFiles($"{Directory.GetCurrentDirectory()}/Images");
+
+        var parallelOptions = new ParallelOptions
+        {
+            CancellationToken = cancellationToken
+        };
+
+        Task.Run(() =>
+        {
+            try
+            {
+                Parallel.ForEach(items, parallelOptions, () => 0L, (item, state, sharedData) =>
+                {
+                    parallelOptions.CancellationToken.ThrowIfCancellationRequested();
+                    configuration.WriteLine($"Getting file size with thread id: {Thread.CurrentThread.ManagedThreadId}");
+                    var fileInfo = new FileInfo(item);
+                    sharedData += fileInfo.Length;
+                    return sharedData;
+                }, (sharedData) => Interlocked.Add(ref totalSize, sharedData));
+            }
+            catch (OperationCanceledException ex)
+            {
+                configuration.WriteLine(ex.Message);
+            }
+        });
+
+        configuration.WriteLine($"File sizes received. {totalSize / 1024 / 1024} mb");
+    }
 }
