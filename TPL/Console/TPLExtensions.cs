@@ -104,4 +104,27 @@ public static class TPLExtensions
 
         configuration.WriteLine($"File sizes received. {totalSize / 1024 / 1024} mb");
     }
+
+    public static void TotalSizeForEachWithSharedData(this IAppConfiguration configuration, bool perform = true)
+    {
+        if (!perform) return;
+
+        var totalSize = 0L;
+
+        var items = Directory.GetFiles($"{Directory.GetCurrentDirectory()}/Images");
+
+        // Parallel.For can also be used.
+        Parallel.ForEach(items, () => 0L, (item, state, sharedData) =>
+        {
+            configuration.WriteLine($"Getting file size with thread id: {Thread.CurrentThread.ManagedThreadId}");
+            var fileInfo = new FileInfo(item);
+            sharedData += fileInfo.Length;
+            return sharedData;
+        }, (sharedData) =>
+        {
+            Interlocked.Add(ref totalSize, sharedData);
+        });
+
+        configuration.WriteLine($"File sizes received. {totalSize / 1024 / 1024} mb");
+    }
 }
