@@ -16,17 +16,33 @@ public class PostManager : IPostService
         _logger = logger;
     }
 
-    public async Task<Post?> GetAsync(int id)
+    public async Task<Post?> GetAsync(int id, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation($"{nameof(GetAsync)}({id}) triggered at {DateTime.Now.GetTime()} with thread id {Thread.CurrentThread.ManagedThreadId}.");
+        try
+        {
+            _logger.LogInformation($"{nameof(GetAsync)}({id}) triggered at {DateTime.Now.GetTime()} with thread id {Thread.CurrentThread.ManagedThreadId}.");
 
-        return await $"{POSTS_URL}/{id}".GetAsync<Post>();
+            return await $"{POSTS_URL}/{id}".GetAsync<Post>(cancellationToken);
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
     }
 
-    public async Task<IEnumerable<Post>?> GetAsync()
+    public async Task<IEnumerable<Post>?> GetAsync(CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation($"{nameof(GetAsync)}() triggered at {DateTime.Now.GetTime()} with thread id {Thread.CurrentThread.ManagedThreadId}.");
+        try
+        {
+            _logger.LogInformation($"{nameof(GetAsync)}() triggered at {DateTime.Now.GetTime()} with thread id {Thread.CurrentThread.ManagedThreadId}.");
 
-        return await POSTS_URL.GetAsync<IEnumerable<Post>>();
+            return await POSTS_URL.GetAsync<IEnumerable<Post>>(cancellationToken);
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex.Message);
+            return null;
+        }
     }
 }

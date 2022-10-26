@@ -1,4 +1,6 @@
+using Common.Entities;
 using Console.Configuration;
+using Console.Models;
 
 namespace Console;
 
@@ -95,12 +97,65 @@ public static class TaskExtensions
     {
         if (!perform) return;
 
-        var task = configuration.PostService.GetAsync();
+        configuration.WriteLine($"Main thread id: {Thread.CurrentThread.ManagedThreadId}");
 
-        await Task.Delay(10000); // It doesn't block the main thread.
+        var tasks = Enumerable.Range(1, 3).Select(s =>
+        {
+            // Task.Run() starts new thread, should be preferred for heavy operations.
+            return Task.Run(() => configuration.PostService.GetAsync(s));
+        });
 
-        var posts = await task;
-        if (posts is null) return;
+        var posts = await Task.WhenAll(tasks);
+
         foreach (var post in posts) configuration.WriteLine(post);
+    }
+
+    public static async Task StartNew(this IAppConfiguration configuration, bool perform = true)
+    {
+        if (!perform) return;
+
+        configuration.WriteLine($"Main thread id: {Thread.CurrentThread.ManagedThreadId}");
+
+        // Creates new thread
+        var task = Task.Factory.StartNew((status) =>
+        {
+            var item = status as Status;
+            if (item is not null) item.ThreadId = Thread.CurrentThread.ManagedThreadId;
+        }, new Status { Date = DateTime.Now });
+
+        await task;
+        var status = task.AsyncState as Status;
+        if (status is not null) configuration.WriteLine(status);
+    }
+
+    public static Task<Post> FromResult(this IAppConfiguration configuration, bool perform = true)
+    {
+        if (!perform) return Task.FromResult<Post>(default!);
+
+        return Task.FromResult<Post>(new Post { Id = 1, UserId = 1, Title = "Lorem Ipsum", Body = "Lorem ipsum dolor sit amet." });
+    }
+
+    public static async Task CancelationToken(this IAppConfiguration configuration, CancellationToken cancellationToken, bool perform = true)
+    {
+        if (!perform) return;
+
+        await Task.Delay(10000, cancellationToken);
+    }
+
+    public static void Result(this IAppConfiguration configuration, bool perform = true)
+    {
+        if (!perform) return;
+
+        var post = configuration.PostService.GetAsync(1).Result;
+        configuration.WriteLine(post);
+    }
+
+    public static ValueTask<Post?> ValueTask(this IAppConfiguration configuration, bool perform = true)
+    {
+        if (!perform) return new ValueTask<Post?>();
+
+        var cachedData = new Post { Id = 1, UserId = 1, Title = "Lorem ipsum", Body = "Lorem ipsum dolor sit amet." };
+
+        return new ValueTask<Post?>(cachedData);
     }
 }
